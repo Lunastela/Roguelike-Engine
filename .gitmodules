@@ -1,0 +1,10 @@
+[submodule "lib/SDL2"]
+	path = lib/SDL2
+	url = https://github.com/libsdl-org/SDL.git
+	branch = release-2.24.x
+[submodule "lib/GLM"]
+	path = lib/GLM
+	url = https://github.com/g-truc/glm.git
+[submodule "lib/GLEW"]
+	path = lib/GLEW
+	url = https://github.com/Perlmint/glew-cmake.git
