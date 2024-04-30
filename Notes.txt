@@ -1,0 +1,10 @@
+Resources:
+
+- https://open.gl/
+
+I've taken a radically different approach this time, I want to learn more and focus less on structure right now.
+The idea is to just run a couple of tests on rendering and see if I can teach myself how to do graphics programming
+during the remainder of the year, as well as maybe streamline some functionality. 
+
+The idea of using a geometry shader for a voxel game at some point sounds real fun, and would most likely streamline the process further.
+Unsure if I should, in a voxel project, use something more like Vulkan or if I am worrying too much about performance pre-eminently. 
