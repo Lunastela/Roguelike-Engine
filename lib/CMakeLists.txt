@@ -1,3 +1,4 @@
+
 # Add the SDL2 Library
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/SDL2)
 
