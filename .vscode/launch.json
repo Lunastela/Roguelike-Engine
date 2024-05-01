@@ -9,6 +9,7 @@
            "args": [],
            "stopAtEntry": false,
            "cwd": "${workspaceFolder}",
+            // "externalConsole": true,
            "MIMode": "gdb",
            "setupCommands": [
                 {
