@@ -17,9 +17,9 @@ add_executable(${PROJECT_NAME} main.cpp)
 
 # Link Libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    SDL2::SDL2main
-    SDL2::SDL2
-    libglew_static
+    ${SDL2_LIBRARIES}
+    gl3w
+    imgui
     glm::glm # GL Math
 )
 target_include_directories(${PROJECT_NAME} PRIVATE include)

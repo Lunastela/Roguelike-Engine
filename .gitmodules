@@ -5,6 +5,9 @@
 [submodule "lib/GLM"]
 	path = lib/GLM
 	url = https://github.com/g-truc/glm.git
-[submodule "lib/GLEW"]
-	path = lib/GLEW
-	url = https://github.com/Perlmint/glew-cmake.git
+[submodule "lib/GL3W"]
+	path = lib/GL3W
+	url = https://github.com/skaslev/gl3w.git
+[submodule "lib/imgui"]
+	path = lib/imgui
+	url = https://github.com/ocornut/imgui.git

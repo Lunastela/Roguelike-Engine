@@ -1,5 +1,9 @@
+#include <imgui.h>
+#include <backends/imgui_impl_opengl3.h>
+#include <backends/imgui_impl_sdl2.h>
+
+#include <GL/gl3w.h>
 #include <SDL.h>
-#include <GL/glew.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -190,14 +194,18 @@ int main(int argc, char* args[]) {
         return destroyWindow(window, context, "Context failed to create");
 	SDL_GL_SetSwapInterval(1); 
 
-	GLenum err;
-    glewExperimental = GL_TRUE;
-    err = glewInit();
-    if (err != GLEW_OK)
-        return destroyWindow(window, context, "GLEW failed to initialize");
+    gl3wInit();
+	ImGui::CreateContext();
+	ImGuiIO &io = ImGui::GetIO();
+    (void) io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+	ImGui_ImplSDL2_InitForOpenGL(window, context);
+	ImGui_ImplOpenGL3_Init();
 
+	ImGui::StyleColorsDark();
 	setupRenderCalls();
 
+	bool show_demo_window = true;
 	SDL_Event windowEvent;
 	uint32_t previous_time = SDL_GetTicks64();
 	uint32_t current_time;
@@ -205,13 +213,20 @@ int main(int argc, char* args[]) {
 	while (true) {
 		current_time = SDL_GetTicks64();
 		if (SDL_PollEvent(&windowEvent)) {
+			ImGui_ImplSDL2_ProcessEvent(&windowEvent);
 			if (windowEvent.type == SDL_QUIT) 
 				break;
 		}
 		delta_time = current_time - previous_time;
 		if (delta_time >= 1000 / FRAME_RATE) {
-			SDL_GL_SwapWindow(window);
-			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_ImplSDL2_NewFrame();
+			ImGui::NewFrame();
+
+			// if (show_demo_window)
+			// 	ImGui::ShowDemoWindow(&show_demo_window);
+			glViewport(0, 0, (int) ImGui::GetIO().DisplaySize.x, (int) ImGui::GetIO().DisplaySize.y);
+			glClearColor(0.0f, 0.0f, 0.0f, 1.0f); 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			glm::mat4 trans = glm::mat4(1.0f);
@@ -223,12 +238,23 @@ int main(int argc, char* args[]) {
 			// glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 
+			// ImGui
+			ImGui::Begin("Hello, world!");
+			ImGui::Text("This is some useful text.");
+			ImGui::End();
+
+			ImGui::Render();
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+			SDL_GL_SwapWindow(window);
 			previous_time = current_time;
 		}
 	}
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
+
 	SDL_GL_DeleteContext(context);
 	SDL_DestroyWindow(window);
     SDL_Quit();
-
 	return 0;
 }
