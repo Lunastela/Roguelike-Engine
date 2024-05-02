@@ -98,7 +98,7 @@ const char* fragmentSource = GLSL(
 	}
 );
 
-int shader_time = 0;
+float shader_time = 0;
 GLuint shaderProgram;
 void setupRenderCalls() {
 	glEnable(GL_DEPTH_TEST);
@@ -192,7 +192,7 @@ int main(int argc, char* args[]) {
 	SDL_GLContext context = SDL_GL_CreateContext(window);
 	if (context == NULL)
         return destroyWindow(window, context, "Context failed to create");
-	SDL_GL_SetSwapInterval(1); 
+	// SDL_GL_SetSwapInterval(1); 
 
     gl3wInit();
 	ImGui::CreateContext();
@@ -209,7 +209,7 @@ int main(int argc, char* args[]) {
 	SDL_Event windowEvent;
 	uint32_t previous_time = SDL_GetTicks64();
 	uint32_t current_time;
-	uint32_t delta_time;
+	float delta_time;
 	while (true) {
 		current_time = SDL_GetTicks64();
 		if (SDL_PollEvent(&windowEvent)) {
@@ -217,8 +217,9 @@ int main(int argc, char* args[]) {
 			if (windowEvent.type == SDL_QUIT) 
 				break;
 		}
-		delta_time = current_time - previous_time;
-		if (delta_time >= 1000 / FRAME_RATE) {
+		delta_time = (float)(current_time - previous_time) / 1000;
+		std::cout << delta_time << "\n";
+		if (delta_time >= 1 / FRAME_RATE) {
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplSDL2_NewFrame();
 			ImGui::NewFrame();
@@ -230,8 +231,8 @@ int main(int argc, char* args[]) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			glm::mat4 trans = glm::mat4(1.0f);
-			shader_time = (shader_time + 1) % 360;
-			trans = glm::rotate(trans, glm::radians((float)shader_time), glm::vec3(0.0f, 0.0f, 1.0f));
+			shader_time = shader_time + (delta_time * FRAME_RATE);
+			trans = glm::rotate(trans, glm::radians(shader_time), glm::vec3(0.0f, 0.0f, 1.0f));
 			GLint uniTrans = glGetUniformLocation(shaderProgram, "model");
 			glUniformMatrix4fv(uniTrans, 1, GL_FALSE, glm::value_ptr(trans));
 
