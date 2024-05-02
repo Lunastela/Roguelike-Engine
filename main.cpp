@@ -8,10 +8,11 @@
 #include <stdio.h>
 #include <iostream>
 
-#define GLSL(src) "#version 150 core\n" #src
+#define GLSL(src) "#version 330 core\n" #src
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
+#define FRAME_RATE 60
 
 GLfloat vertices[] = {
         -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
@@ -136,7 +137,7 @@ void setupRenderCalls() {
 	GLint colAttrib = glGetAttribLocation(shaderProgram, "color");
 	glEnableVertexAttribArray(colAttrib);
 	glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE,
-		5 * sizeof(float), (void*)(2 * sizeof(float)));
+		5 * sizeof(float), (void*)(1 * sizeof(float)));
 
 	glm::mat4 view = glm::lookAt(
 		glm::vec3(1.2f, 1.2f, 1.2f),
@@ -178,7 +179,7 @@ int main(int argc, char* args[]) {
 		return destroyWindow(window, NULL, "Window failed to create");
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(
         SDL_GL_CONTEXT_PROFILE_MASK,
         SDL_GL_CONTEXT_PROFILE_CORE);
@@ -198,23 +199,36 @@ int main(int argc, char* args[]) {
 	setupRenderCalls();
 
 	SDL_Event windowEvent;
+	uint32_t previous_time = SDL_GetTicks64();
+	uint32_t current_time;
+	uint32_t delta_time;
 	while (true) {
+		current_time = SDL_GetTicks64();
 		if (SDL_PollEvent(&windowEvent)) {
 			if (windowEvent.type == SDL_QUIT) 
 				break;
 		}
-		SDL_GL_SwapWindow(window);
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		delta_time = current_time - previous_time;
+		if (delta_time >= 1000 / FRAME_RATE) {
+			SDL_GL_SwapWindow(window);
+			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glm::mat4 trans = glm::mat4(1.0f);
-		shader_time = (shader_time + 1) % 360;
-		trans = glm::rotate(trans, glm::radians((float)shader_time), glm::vec3(0.0f, 0.0f, 1.0f));
-		GLint uniTrans = glGetUniformLocation(shaderProgram, "model");
-		glUniformMatrix4fv(uniTrans, 1, GL_FALSE, glm::value_ptr(trans));
+			glm::mat4 trans = glm::mat4(1.0f);
+			shader_time = (shader_time + 1) % 360;
+			trans = glm::rotate(trans, glm::radians((float)shader_time), glm::vec3(0.0f, 0.0f, 1.0f));
+			GLint uniTrans = glGetUniformLocation(shaderProgram, "model");
+			glUniformMatrix4fv(uniTrans, 1, GL_FALSE, glm::value_ptr(trans));
 
-		// glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+			// glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+
+			previous_time = current_time;
+		}
 	}
+	SDL_GL_DeleteContext(context);
+	SDL_DestroyWindow(window);
+    SDL_Quit();
+
 	return 0;
 }
