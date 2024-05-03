@@ -2,8 +2,8 @@
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_sdl2.h>
 
-#include <GL/gl3w.h>
 #include <SDL.h>
+#include <GL/gl3w.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -16,7 +16,7 @@
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
-#define FRAME_RATE 60
+#define FRAME_RATE 120
 
 GLfloat vertices[] = {
         -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
@@ -195,7 +195,7 @@ int main(int argc, char* args[]) {
 	// SDL_GL_SetSwapInterval(1); 
 
     gl3wInit();
-	ImGui::CreateContext();
+	ImGuiContext *guiContext = ImGui::CreateContext();
 	ImGuiIO &io = ImGui::GetIO();
     (void) io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
@@ -205,11 +205,12 @@ int main(int argc, char* args[]) {
 	ImGui::StyleColorsDark();
 	setupRenderCalls();
 
-	bool show_demo_window = true;
+	bool show_demo_window = false;
 	SDL_Event windowEvent;
 	uint32_t previous_time = SDL_GetTicks64();
 	uint32_t current_time;
 	float delta_time;
+	float delta_time_target = (1.0 / (float)FRAME_RATE);
 	while (true) {
 		current_time = SDL_GetTicks64();
 		if (SDL_PollEvent(&windowEvent)) {
@@ -218,14 +219,13 @@ int main(int argc, char* args[]) {
 				break;
 		}
 		delta_time = (float)(current_time - previous_time) / 1000;
-		std::cout << delta_time << "\n";
-		if (delta_time >= 1 / FRAME_RATE) {
+		if (delta_time >= delta_time_target) {
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplSDL2_NewFrame();
 			ImGui::NewFrame();
 
-			// if (show_demo_window)
-			// 	ImGui::ShowDemoWindow(&show_demo_window);
+			if (show_demo_window)
+				ImGui::ShowDemoWindow(&show_demo_window);
 			glViewport(0, 0, (int) ImGui::GetIO().DisplaySize.x, (int) ImGui::GetIO().DisplaySize.y);
 			glClearColor(0.0f, 0.0f, 0.0f, 1.0f); 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -252,7 +252,7 @@ int main(int argc, char* args[]) {
 	}
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
-	ImGui::DestroyContext();
+	ImGui::DestroyContext(guiContext);
 
 	SDL_GL_DeleteContext(context);
 	SDL_DestroyWindow(window);
