@@ -8,15 +8,25 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 # Include Dependency List
 include(lib/CMakeLists.txt)
 
-# Compile the main project
-add_executable(${PROJECT_NAME} main.cpp)
-
 # Link Libraries
-target_link_libraries(${PROJECT_NAME} PRIVATE
+link_libraries(
     SDL2::SDL2main
     SDL2::SDL2
     gl3w
     imgui
-    glm::glm # GL Math
+    glm::glm
 )
+
+# Define main sources
+set(SOURCES src/main.cpp)
+
+set(ENGINE_NAME engine)
+set(ENGINE_DIR ${CMAKE_CURRENT_LIST_DIR}/src/engine)
+set(ENGINE_SOURCES)
+include(src/CMakeLists.txt)
+add_library(${ENGINE_NAME} SHARED ${ENGINE_SOURCES})
+
+# Add the main sources
+add_executable(${PROJECT_NAME} ${SOURCES})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${ENGINE_NAME})
 target_include_directories(${PROJECT_NAME} PRIVATE include)

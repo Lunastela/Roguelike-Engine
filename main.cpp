@@ -12,12 +12,6 @@
 #include <stdio.h>
 #include <iostream>
 
-#define GLSL(src) "#version 330 core\n" #src
-
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
-#define FRAME_RATE 120
-
 GLfloat vertices[] = {
         -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
          0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
@@ -66,37 +60,6 @@ GLuint elements[] = {
     0, 1, 2,
     2, 3, 0
 };
-
-const char* vertexSource = GLSL(
-	in vec3 position;
-	in vec3 color;
-	in vec2 texcoord;
-
-	out vec3 Color;
-	out vec2 Texcoord;
-
-	uniform mat4 model;
-	uniform mat4 view;
-	uniform mat4 proj;
-
-	void main()
-	{
-		Color = color;
-		Texcoord = texcoord;
-		gl_Position = proj * view * model * vec4(position, 1.0);
-	}
-);
-
-const char* fragmentSource = GLSL(
-	in vec3 Color;
-
-	out vec4 outColor;
-
-	void main()
-	{
-		outColor = vec4(Color, 1.0);
-	}
-);
 
 float shader_time = 0;
 GLuint shaderProgram;
